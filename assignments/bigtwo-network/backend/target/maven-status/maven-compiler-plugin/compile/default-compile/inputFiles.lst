@@ -1,0 +1,14 @@
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\persistence\GameRecordService.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\model\Card.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\model\GameLogic.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\server\WebSocketConfig.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\model\GameRoom.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\server\BigTwoApplication.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\game\RoomManager.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\game\GameEngine.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\server\handler\GameWebSocketHandler.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\config\SQLiteConfig.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\persistence\RoomStateRedisService.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\model\GamePlayer.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\model\HandType.java
+D:\30_Project_Workspace\Source_Code\Java_Course_S2\Assignments\bigtwo-network\backend\src\main\java\com\bigtwo\model\GameState.java

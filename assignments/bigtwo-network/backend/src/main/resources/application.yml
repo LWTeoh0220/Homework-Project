@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: bigtwo-server
+  
+  # Redis configuration
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 60000ms
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+  
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+logging:
+  level:
+    root: INFO
+    com.bigtwo: DEBUG
+
+app:
+  websocket:
+    allowed-origins: "http://localhost:*,http://127.0.0.1:*,http://[::1]:*"
+  sqlite:
+    url: "jdbc:sqlite:${user.home}/.bigtwo/bigtwo.db"
