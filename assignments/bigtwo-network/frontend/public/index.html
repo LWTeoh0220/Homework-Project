@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大老二網絡版</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="lobbyPanel" class="panel active">
+        <div class="panel-content">
+            <h1>大老二網絡版</h1>
+
+            <div class="section">
+                <h2>加入遊戲</h2>
+                <div class="input-group">
+                    <input type="text" id="playerNameInput" placeholder="輸入你的暱稱" maxlength="20">
+                </div>
+                <button id="createRoomBtn" class="btn btn-primary">建立房間</button>
+                <button id="refreshRoomsBtn" class="btn btn-secondary">刷新房間列表</button>
+            </div>
+
+            <div class="section">
+                <h2>可用房間</h2>
+                <div id="roomsList" class="rooms-container">
+                    <p class="empty">暫無房間</p>
+                </div>
+            </div>
+
+            <div id="lobbyError" class="error-message"></div>
+        </div>
+    </div>
+
+    <div id="waitingPanel" class="panel">
+        <div class="panel-content">
+            <h1 id="roomNameDisplay">房間</h1>
+            <p class="subtitle">等待所有玩家準備...</p>
+            <p class="subtitle">準備完成後將進入對局區</p>
+
+            <div class="seats-container">
+                <div id="seat0" class="seat"><div class="seat-player">--</div></div>
+                <div id="seat1" class="seat"><div class="seat-player">--</div></div>
+                <div id="seat2" class="seat"><div class="seat-player">--</div></div>
+                <div id="seat3" class="seat"><div class="seat-player">--</div></div>
+            </div>
+
+            <div class="button-group">
+                <button id="readyBtn" class="btn btn-primary">準備</button>
+                <button id="leaveWaitingBtn" class="btn btn-secondary">離開房間</button>
+            </div>
+
+            <div id="waitingError" class="error-message"></div>
+        </div>
+    </div>
+
+    <div id="gamePanel" class="panel">
+        <div class="panel-content game-layout">
+            <div class="game-top">
+                <div id="opponent0" class="opponent-seat">
+                    <div class="opponent-name">--</div>
+                    <div class="opponent-cards"></div>
+                    <div class="opponent-hand-size">0 張</div>
+                </div>
+                <div id="opponent1" class="opponent-seat">
+                    <div class="opponent-name">--</div>
+                    <div class="opponent-cards"></div>
+                    <div class="opponent-hand-size">0 張</div>
+                </div>
+                <div id="opponent2" class="opponent-seat">
+                    <div class="opponent-name">--</div>
+                    <div class="opponent-cards"></div>
+                    <div class="opponent-hand-size">0 張</div>
+                </div>
+            </div>
+
+            <div class="game-middle">
+                <div class="table-area">
+                    <div class="current-turn-indicator" id="turnIndicator">等待...</div>
+                    <div class="table-cards" id="tableCards">
+                        <span class="placeholder">等待出牌...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-bottom">
+                <div class="hand-info"><span id="handCount">0 張牌</span></div>
+                <div class="hand-cards" id="handCards">
+                    <span class="placeholder">載入中...</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="suggestBtn" class="btn btn-secondary">建議</button>
+                <button id="playBtn" class="btn btn-primary" disabled>出牌</button>
+                <button id="passBtn" class="btn btn-secondary" disabled>Pass</button>
+                <button id="leaveGameBtn" class="btn btn-danger">離開對局</button>
+            </div>
+
+            <div id="suggestionOptions" class="suggestion-options"></div>
+            <div id="lastAction" class="last-action">最近動作: 暫無</div>
+
+            <p class="subtitle">對局區中離開將返回準備區</p>
+            <div id="gameError" class="error-message"></div>
+        </div>
+
+        <div id="settlementOverlay" class="settlement-overlay">
+            <div class="settlement-card">
+                <h2 id="settlementTitle">本局結算</h2>
+                <p id="settlementWinner" class="settlement-winner">贏家: -</p>
+                <div id="settlementRows" class="settlement-rows"></div>
+                <div class="settlement-actions">
+                    <button id="settlementCloseBtn" class="btn btn-secondary">返回準備區</button>
+                    <button id="settlementReadyBtn" class="btn btn-primary">我已準備下一局</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="ws.js?v=20260426-8"></script>
+    <script src="ui.js?v=20260426-8"></script>
+</body>
+</html>

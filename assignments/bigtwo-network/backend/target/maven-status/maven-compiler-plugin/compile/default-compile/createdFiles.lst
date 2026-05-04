@@ -1,0 +1,15 @@
+com\bigtwo\model\Card.class
+com\bigtwo\model\GameLogic$1.class
+com\bigtwo\server\handler\GameWebSocketHandler.class
+com\bigtwo\persistence\GameRecordService.class
+com\bigtwo\model\GameLogic.class
+com\bigtwo\config\SQLiteConfig.class
+com\bigtwo\game\RoomManager.class
+com\bigtwo\server\BigTwoApplication.class
+com\bigtwo\server\WebSocketConfig.class
+com\bigtwo\model\GameRoom.class
+com\bigtwo\model\GamePlayer.class
+com\bigtwo\model\GameState.class
+com\bigtwo\persistence\RoomStateRedisService.class
+com\bigtwo\game\GameEngine.class
+com\bigtwo\model\HandType.class
