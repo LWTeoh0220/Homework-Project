@@ -7,35 +7,40 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+        <!-- 連接狀態指示器 -->
+    <div id="connectionStatus" class="connection-status">
+        <span class="status-dot"></span>
+        <span class="status-text">正在連接...</span>
+    </div>
+
     <div id="lobbyPanel" class="panel active">
         <div class="panel-content">
-            <h1>大老二網絡版</h1>
-
-            <div class="section">
-                <h2>加入遊戲</h2>
-                <div class="input-group">
-                    <input type="text" id="playerNameInput" placeholder="輸入你的暱稱" maxlength="20">
-                </div>
-                <button id="createRoomBtn" class="btn btn-primary">建立房間</button>
-                <button id="refreshRoomsBtn" class="btn btn-secondary">刷新房間列表</button>
-            </div>
-
-            <div class="section">
-                <h2>可用房間</h2>
-                <div id="roomsList" class="rooms-container">
-                    <p class="empty">暫無房間</p>
+            <div class="lobby-simple">
+                <h1 style="text-align:center; margin: 18px 0 10px;">大老二 網絡桌</h1>
+                <div class="section entry-section" style="max-width:560px; margin: 0 auto;">
+                    <div class="input-group" style="justify-content:center; gap:12px;">
+                        <input type="text" id="playerNameInput" placeholder="輸入你的暱稱" maxlength="20" style="max-width:320px;" />
+                        <button id="confirmCreateRoomBtn" class="btn btn-primary">開始</button>
+                    </div>
+                    <div class="button-group" style="justify-content:center; margin-top:12px;">
+                        <button id="refreshRoomsBtn" class="btn btn-secondary">查看房間</button>
+                    </div>
+                    <div id="roomsList" class="rooms-container" style="margin-top:14px;"><p class="empty">暫無房間</p></div>
+                    <div id="lobbyError" class="error-message" style="margin-top:12px;"></div>
                 </div>
             </div>
-
-            <div id="lobbyError" class="error-message"></div>
         </div>
     </div>
 
     <div id="waitingPanel" class="panel">
         <div class="panel-content">
-            <h1 id="roomNameDisplay">房間</h1>
-            <p class="subtitle">等待所有玩家準備...</p>
-            <p class="subtitle">準備完成後將進入對局區</p>
+            <header class="room-banner">
+                <div>
+                    <p class="eyebrow">等待區</p>
+                    <h1 id="roomNameDisplay">牌桌準備中</h1>
+                </div>
+                <p class="subtitle">等待其他玩家加入</p>
+            </header>
 
             <div class="seats-container">
                 <div id="seat0" class="seat"><div class="seat-player">--</div></div>
@@ -55,21 +60,32 @@
 
     <div id="gamePanel" class="panel">
         <div class="panel-content game-layout">
+            <header class="game-banner">
+                <div>
+                    <p class="eyebrow">對局中</p>
+                    <h1 id="gameTitle">牌桌已展開</h1>
+                    <p class="subtitle">保持節奏，依局勢出牌。</p>
+                </div>
+                <div class="game-banner-meta">
+                    <div class="meta-pill" id="playerCountPill">席位 0 / 4</div>
+                </div>
+            </header>
+
             <div class="game-top">
                 <div id="opponent0" class="opponent-seat">
                     <div class="opponent-name">--</div>
                     <div class="opponent-cards"></div>
-                    <div class="opponent-hand-size">0 張</div>
+                    <div class="opponent-hand-size">0</div>
                 </div>
                 <div id="opponent1" class="opponent-seat">
                     <div class="opponent-name">--</div>
                     <div class="opponent-cards"></div>
-                    <div class="opponent-hand-size">0 張</div>
+                    <div class="opponent-hand-size">0</div>
                 </div>
                 <div id="opponent2" class="opponent-seat">
                     <div class="opponent-name">--</div>
                     <div class="opponent-cards"></div>
-                    <div class="opponent-hand-size">0 張</div>
+                    <div class="opponent-hand-size">0</div>
                 </div>
             </div>
 
@@ -83,23 +99,22 @@
             </div>
 
             <div class="game-bottom">
-                <div class="hand-info"><span id="handCount">0 張牌</span></div>
+                <div class="hand-info"><span class="hand-label">手牌</span><span id="handCount">0</span></div>
                 <div class="hand-cards" id="handCards">
                     <span class="placeholder">載入中...</span>
                 </div>
             </div>
 
             <div class="action-buttons">
-                <button id="suggestBtn" class="btn btn-secondary">建議</button>
+                <button id="suggestBtn" class="btn btn-secondary">提示</button>
                 <button id="playBtn" class="btn btn-primary" disabled>出牌</button>
-                <button id="passBtn" class="btn btn-secondary" disabled>Pass</button>
-                <button id="leaveGameBtn" class="btn btn-danger">離開對局</button>
+                <button id="passBtn" class="btn btn-secondary" disabled>不出</button>
+                <button id="leaveGameBtn" class="btn btn-danger">離開</button>
             </div>
 
             <div id="suggestionOptions" class="suggestion-options"></div>
-            <div id="lastAction" class="last-action">最近動作: 暫無</div>
+            <div id="lastAction" class="last-action">最近：暫無</div>
 
-            <p class="subtitle">對局區中離開將返回準備區</p>
             <div id="gameError" class="error-message"></div>
         </div>
 
@@ -116,7 +131,7 @@
         </div>
     </div>
 
-    <script src="ws.js?v=20260426-8"></script>
-    <script src="ui.js?v=20260426-8"></script>
+    <script src="ws.js?v=20260504-2"></script>
+    <script src="ui.js?v=20260504-2"></script>
 </body>
 </html>
