@@ -20,8 +20,12 @@ class GameUI {
         this.playerNameInput = document.getElementById('playerNameInput');
         this.createRoomBtn = document.getElementById('createRoomBtn');
         this.refreshRoomsBtn = document.getElementById('refreshRoomsBtn');
+        this.confirmCreateRoomBtn = document.getElementById('confirmCreateRoomBtn');
+        this.loadRoomsBtn = document.getElementById('loadRoomsBtn');
         this.roomsList = document.getElementById('roomsList');
         this.lobbyError = document.getElementById('lobbyError');
+        this.createRoomPanel = document.getElementById('createRoomPanel');
+        this.roomsPanel = document.getElementById('roomsPanel');
 
         this.waitingPanel = document.getElementById('waitingPanel');
         this.roomNameDisplay = document.getElementById('roomNameDisplay');
@@ -47,35 +51,93 @@ class GameUI {
         this.settlementRows = document.getElementById('settlementRows');
         this.settlementCloseBtn = document.getElementById('settlementCloseBtn');
         this.settlementReadyBtn = document.getElementById('settlementReadyBtn');
+
+        this.connectionStatus = document.getElementById('connectionStatus');
+        this.statusDot = this.connectionStatus ? this.connectionStatus.querySelector('.status-dot') : null;
+        this.statusText = this.connectionStatus ? this.connectionStatus.querySelector('.status-text') : null;
+        this.heroConnectionState = document.getElementById('heroConnectionState');
+        this.playerCountPill = document.getElementById('playerCountPill');
+        this.turnHintPill = document.getElementById('turnHintPill');
     }
 
     bindEvents() {
-        this.createRoomBtn?.addEventListener('click', () => this.handleCreateRoom());
-        this.refreshRoomsBtn?.addEventListener('click', () => this.handleGetRooms());
+        if (this.createRoomBtn) {
+            this.createRoomBtn.addEventListener('click', () => this.openLobbyDrawer('createRoomPanel'));
+        }
+        if (this.refreshRoomsBtn) {
+            this.refreshRoomsBtn.addEventListener('click', () => this.openLobbyDrawer('roomsPanel'));
+        }
 
-        this.readyBtn?.addEventListener('click', () => this.handleReady());
-        this.leaveWaitingBtn?.addEventListener('click', () => this.handleLeaveRoom());
+        if (this.confirmCreateRoomBtn) {
+            this.confirmCreateRoomBtn.addEventListener('click', () => this.handleCreateRoom());
+        }
+        if (this.loadRoomsBtn) {
+            this.loadRoomsBtn.addEventListener('click', () => this.handleGetRooms(true));
+        }
 
-        this.suggestBtn?.addEventListener('click', () => this.handleSuggest());
-        this.playBtn?.addEventListener('click', () => this.handlePlayCards());
-        this.passBtn?.addEventListener('click', () => this.handlePass());
-        this.leaveGameBtn?.addEventListener('click', () => this.handleLeaveRoom());
-
-        this.settlementCloseBtn?.addEventListener('click', () => {
-            this.hideSettlement();
-            this.switchPanel('waiting');
+        document.querySelectorAll('[data-close-drawer]').forEach(button => {
+            button.addEventListener('click', () => {
+                const drawerId = button.getAttribute('data-close-drawer');
+                this.closeLobbyDrawer(drawerId);
+            });
         });
 
-        this.settlementReadyBtn?.addEventListener('click', () => {
-            this.hideSettlement();
-            this.switchPanel('waiting');
-            this.handleReady();
-        });
+        if (this.playerNameInput) {
+            this.playerNameInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    this.handleCreateRoom();
+                }
+            });
+        }
+
+        if (this.readyBtn) {
+            this.readyBtn.addEventListener('click', () => this.handleReady());
+        }
+        if (this.leaveWaitingBtn) {
+            this.leaveWaitingBtn.addEventListener('click', () => this.handleLeaveRoom());
+        }
+
+        if (this.suggestBtn) {
+            this.suggestBtn.addEventListener('click', () => this.handleSuggest());
+        }
+        if (this.playBtn) {
+            this.playBtn.addEventListener('click', () => this.handlePlayCards());
+        }
+        if (this.passBtn) {
+            this.passBtn.addEventListener('click', () => this.handlePass());
+        }
+        if (this.leaveGameBtn) {
+            this.leaveGameBtn.addEventListener('click', () => this.handleLeaveRoom());
+        }
+
+        if (this.settlementCloseBtn) {
+            this.settlementCloseBtn.addEventListener('click', () => {
+                this.hideSettlement();
+                this.switchPanel('waiting');
+            });
+        }
+
+        if (this.settlementReadyBtn) {
+            this.settlementReadyBtn.addEventListener('click', () => {
+                this.hideSettlement();
+                this.switchPanel('waiting');
+                this.handleReady();
+            });
+        }
     }
 
     setupWebSocketHandlers() {
-        gameWs.on('connected', () => this.showMessage('已連接至伺服器'));
-        gameWs.on('error', () => this.showError('連線異常，請重試', 'lobby'));
+        gameWs.on('connected', () => {
+            this.updateConnectionStatus('connected', '已連接');
+            this.showMessage('已連接至伺服器');
+        });
+        gameWs.on('disconnected', () => {
+            this.updateConnectionStatus('disconnected', '已斷開');
+        });
+        gameWs.on('error', () => {
+            this.updateConnectionStatus('error', '連線錯誤');
+            this.showError('連線異常，請重試', 'lobby');
+        });
 
         gameWs.on('ROOM_CREATED', (msg) => this.handleRoomCreated(msg));
         gameWs.on('ROOM_JOINED', (msg) => this.handleRoomJoined(msg));
@@ -97,9 +159,10 @@ class GameUI {
             return;
         }
 
+        this.setLoadingState(this.confirmCreateRoomBtn || this.createRoomBtn, true);
         gameWs.send({
             type: 'CREATE_ROOM',
-            roomName: `${playerName}的房間`,
+            roomName: `${playerName} 的牌桌`,
             playerName
         });
     }
@@ -111,8 +174,29 @@ class GameUI {
         this.updateWaitingRoom(msg);
     }
 
-    handleGetRooms() {
+    handleGetRooms(fromDrawer = false) {
+        if (fromDrawer) {
+            this.setLoadingState(this.loadRoomsBtn, true);
+        }
         gameWs.send({ type: 'GET_ROOMS' });
+    }
+
+    openLobbyDrawer(drawerId) {
+        const drawers = [this.createRoomPanel, this.roomsPanel].filter(Boolean);
+        drawers.forEach(drawer => {
+            drawer.classList.toggle('open', drawer.id === drawerId);
+        });
+
+        if (drawerId === 'roomsPanel') {
+            this.handleGetRooms(true);
+        }
+    }
+
+    closeLobbyDrawer(drawerId) {
+        const drawer = document.getElementById(drawerId);
+        if (drawer) {
+            drawer.classList.remove('open');
+        }
     }
 
     displayRoomsList(msg) {
@@ -162,6 +246,7 @@ class GameUI {
 
         this.roomNameDisplay.textContent = msg.roomName;
         const players = msg.players || [];
+        this.updateLobbyMetrics(players);
 
         for (let i = 0; i < 4; i++) {
             const seat = document.getElementById(`seat${i}`);
@@ -189,6 +274,7 @@ class GameUI {
     }
 
     handleReady() {
+        this.setLoadingState(this.readyBtn, true);
         gameWs.send({ type: 'READY' });
     }
 
@@ -226,15 +312,21 @@ class GameUI {
             return;
         }
 
+        this.setLoadingState(this.playBtn, true);
         const cards = Array.from(this.selectedCards).map(power => ({ power: parseInt(power, 10) }));
         gameWs.send({ type: 'PLAY_CARDS', cards });
     }
 
     handlePass() {
+        this.setLoadingState(this.passBtn, true);
         gameWs.send({ type: 'PASS' });
     }
 
     handleSuggest() {
+        this.setLoadingState(this.suggestBtn, true);
+        if (this.suggestionOptions) {
+            this.suggestionOptions.classList.add('open');
+        }
         gameWs.send({ type: 'SUGGEST' });
     }
 
@@ -268,9 +360,9 @@ class GameUI {
         }
 
         const options = [
-            { key: 'conservative', label: '保守' },
-            { key: 'balanced', label: '均衡' },
-            { key: 'aggressive', label: '進攻' }
+            { key: 'conservative', label: '方案 A' },
+            { key: 'balanced', label: '方案 B' },
+            { key: 'aggressive', label: '方案 C' }
         ];
 
         this.suggestionOptions.innerHTML = options.map(opt => {
@@ -327,6 +419,7 @@ class GameUI {
         this.updateOpponentDisplay();
         this.updatePlayerButtons();
         this.updateLastAction();
+        this.updateGameBanner();
     }
 
     updateTurnIndicator() {
@@ -337,7 +430,10 @@ class GameUI {
         const state = this.gameState;
         const current = state.players[state.currentPlayer];
         const currentPlayerName = current ? current.name : '-';
-        this.turnIndicator.textContent = `當前輪到: ${currentPlayerName}`;
+        this.turnIndicator.textContent = `輪到：${currentPlayerName}`;
+        if (this.turnHintPill) {
+            this.turnHintPill.textContent = current && current.playerId === this.currentPlayerId ? '輪到你出牌' : `輪到 ${currentPlayerName}`;
+        }
     }
 
     updateTableDisplay() {
@@ -368,8 +464,8 @@ class GameUI {
                 if (opponent) {
                     const name = players[i].bot ? `${players[i].name} 🤖` : players[i].name;
                     opponent.querySelector('.opponent-name').textContent = name;
-                        opponent.querySelector('.opponent-hand-size').textContent = `${this.cardCountLabel(players[i].handSize)}`;
-                        opponent.querySelector('.opponent-cards').innerHTML = this.renderCardStrip(players[i].handSize, true);
+                    opponent.querySelector('.opponent-hand-size').textContent = `${players[i].handSize}`;
+                    opponent.querySelector('.opponent-cards').innerHTML = this.renderCardStrip(players[i].handSize, true);
                 }
                 opponentIndex++;
             }
@@ -388,11 +484,15 @@ class GameUI {
         this.suggestBtn.disabled = !isCurrentPlayer;
         this.playBtn.disabled = !isCurrentPlayer;
         this.passBtn.disabled = !(isCurrentPlayer && tableCards.length > 0);
+
+        if (this.playerCountPill) {
+            this.playerCountPill.textContent = `玩家 ${this.gameState.players.length} / 4`;
+        }
     }
 
     updateLastAction() {
         if (this.lastAction && this.gameState) {
-            this.lastAction.textContent = `最近動作: ${this.gameState.lastAction || '暫無'}`;
+            this.lastAction.textContent = `最近：${this.gameState.lastAction || '暫無'}`;
         }
     }
 
@@ -401,7 +501,7 @@ class GameUI {
             return;
         }
 
-        this.handCount.textContent = `${this.playerHand.length} 張牌`;
+        this.handCount.textContent = `${this.playerHand.length}`;
 
         this.handCards.innerHTML = this.playerHand.map(card => {
             const isSelected = this.selectedCards.has(card.power.toString());
@@ -447,17 +547,7 @@ class GameUI {
             return `<span class="opponent-card-mini${isMore ? ' more' : ''}"></span>`;
         }).join('');
 
-        return `<div class="settlement-card-strip">${cards}${count > maxVisible ? `<span class="opponent-hand-size">+${count - maxVisible}</span>` : ''}</div>`;
-    }
-
-    cardCountLabel(count) {
-        if (count === 0) {
-            return '已出完';
-        }
-        if (count === 1) {
-            return '1 張';
-        }
-        return `${count} 張`;
+        return `<div class="settlement-card-strip">${cards}${count > maxVisible ? '<span class="card-stack-more">…</span>' : ''}</div>`;
     }
 
     handleLeaveRoom() {
@@ -468,6 +558,9 @@ class GameUI {
         this.currentPlayerId = null;
         this.suggestionOptionsData = {};
         this.suggestionOptions.innerHTML = '';
+        if (this.suggestionOptions) {
+            this.suggestionOptions.classList.remove('open');
+        }
     }
 
     switchPanel(panelName) {
@@ -482,6 +575,29 @@ class GameUI {
         console.log(msg);
     }
 
+    setLoadingState(button, isLoading) {
+        if (!button) {
+            return;
+        }
+
+        button.classList.toggle('loading', !!isLoading);
+        if (isLoading) {
+            setTimeout(() => button.classList.remove('loading'), 500);
+        }
+    }
+
+    updateLobbyMetrics(players) {
+        if (this.playerCountPill) {
+            this.playerCountPill.textContent = `玩家 ${players.length} / 4`;
+        }
+    }
+
+    updateGameBanner() {
+        if (this.playerCountPill && this.gameState) {
+            this.playerCountPill.textContent = `玩家 ${this.gameState.players.length} / 4`;
+        }
+    }
+
     showError(msg, panel = 'lobby') {
         const errorElement = document.getElementById(`${panel}Error`);
         if (errorElement) {
@@ -490,16 +606,29 @@ class GameUI {
             setTimeout(() => errorElement.classList.remove('show'), 3000);
         }
     }
+
+    updateConnectionStatus(status, text) {
+        if (!this.statusDot || !this.statusText) {
+            return;
+        }
+
+        this.statusDot.className = 'status-dot ' + status;
+        this.statusText.textContent = text;
+        if (this.heroConnectionState) {
+            this.heroConnectionState.textContent = text;
+        }
+    }
 }
 
-const gameUI = new GameUI();
+window.gameUI = new GameUI();
 
 window.addEventListener('load', async () => {
     try {
+        window.gameUI.updateConnectionStatus('connecting', '正在連接');
         await gameWs.connect();
-        gameUI.handleGetRooms();
+        window.gameUI.handleGetRooms();
     } catch (e) {
         console.error('Failed to connect:', e);
-        gameUI.showError('連線失敗，請重新整理後再試', 'lobby');
+        window.gameUI.showError('連線失敗，請重新整理後再試', 'lobby');
     }
 });
